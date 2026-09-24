@@ -1,0 +1,105 @@
+<% content_for :title, "#{@invoice.number} · Tresora" %>
+
+<section class="page-header page-header--compact">
+  <div>
+    <p class="eyebrow">Facturation</p>
+    <h1>Facture <%= @invoice.number %></h1>
+    <p class="page-header__description">Émise le <%= format_date(@invoice.issued_on) %> · Échéance le <%= format_date(@invoice.due_on) %></p>
+  </div>
+  <div class="page-header__actions">
+    <%= link_to "Modifier", edit_invoice_path(@invoice), class: "button button--secondary" %>
+    <% if @invoice.draft? %>
+      <%= button_to "Marquer comme envoyée", mark_as_sent_invoice_path(@invoice), method: :patch, class: "button button--primary" %>
+    <% elsif !@invoice.paid? %>
+      <%= button_to "Marquer comme payée", mark_as_paid_invoice_path(@invoice), method: :patch, class: "button button--primary" %>
+    <% end %>
+  </div>
+</section>
+
+<section class="invoice-layout">
+  <div class="card invoice-preview">
+    <div class="invoice-preview__header">
+      <div>
+        <p class="eyebrow">Tresora</p>
+        <h2>Facture</h2>
+      </div>
+      <span class="badge <%= invoice_status_class(@invoice) %>"><%= invoice_status_label(@invoice) %></span>
+    </div>
+
+    <div class="invoice-parties">
+      <div>
+        <span class="label">Émetteur</span>
+        <strong>Tresora</strong>
+        <p>Votre activité<br>Paris, France</p>
+      </div>
+      <div>
+        <span class="label">Facturé à</span>
+        <strong><%= @invoice.client.display_name %></strong>
+        <p>
+          <%= @invoice.client.address.presence || "Adresse non renseignée" %><br>
+          <%= @invoice.client.email if @invoice.client.email.present? %>
+        </p>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table class="data-table invoice-lines">
+        <thead>
+          <tr>
+            <th>Description</th>
+            <th class="numeric">Qté</th>
+            <th class="numeric">Prix HT</th>
+            <th class="numeric">TVA</th>
+            <th class="numeric">Total HT</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @invoice.invoice_lines.each do |line| %>
+            <tr>
+              <td><%= line.description %></td>
+              <td class="numeric"><%= number_with_precision(line.quantity, precision: 2) %></td>
+              <td class="numeric"><%= format_euros(line.unit_price) %></td>
+              <td class="numeric"><%= number_with_precision(line.vat_rate, precision: 1) %>%</td>
+              <td class="numeric"><%= format_euros(line.amount_ht) %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="invoice-totals">
+      <div><span>Total HT</span><strong><%= format_euros(@invoice.total_ht) %></strong></div>
+      <div><span>TVA</span><strong><%= format_euros(@invoice.total_vat) %></strong></div>
+      <div class="invoice-totals__grand"><span>Total TTC</span><strong><%= format_euros(@invoice.total_ttc) %></strong></div>
+    </div>
+
+    <% if @invoice.notes.present? %>
+      <div class="invoice-note">
+        <span class="label">Note</span>
+        <p><%= @invoice.notes %></p>
+      </div>
+    <% end %>
+  </div>
+
+  <aside class="invoice-aside">
+    <div class="card next-step-card">
+      <span class="label">Prochaine étape</span>
+      <% if @invoice.draft? %>
+        <h3>Prête à être envoyée</h3>
+        <p>Vérifiez les informations, puis faites passer la facture en statut « envoyée ».</p>
+      <% elsif @invoice.paid? %>
+        <h3>Facture encaissée</h3>
+        <p>Le montant est considéré comme encaissé dans cette démonstration.</p>
+      <% else %>
+        <h3><%= @invoice.overdue? ? "Relancer le client" : "Attendre l’échéance" %></h3>
+        <p><%= @invoice.overdue? ? "Cette facture a dépassé son délai de règlement." : "Le suivi de cette facture est actif." %></p>
+      <% end %>
+    </div>
+
+    <div class="card danger-zone">
+      <span class="label">Zone sensible</span>
+      <p>La suppression est définitive.</p>
+      <%= button_to "Supprimer la facture", invoice_path(@invoice), method: :delete, class: "button button--ghost-danger", form: { data: { turbo_confirm: "Supprimer cette facture ?" } } %>
+    </div>
+  </aside>
+</section>

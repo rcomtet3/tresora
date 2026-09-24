@@ -1,0 +1,78 @@
+<%= form_with model: invoice, class: "form", data: { controller: "line-items" } do |form| %>
+  <%= render "shared/form_errors", record: invoice %>
+
+  <div class="form-section">
+    <div class="form-section__intro">
+      <h2>Informations générales</h2>
+      <p>Identifiez la facture et son client.</p>
+    </div>
+
+    <div class="form-grid">
+      <div class="field">
+        <%= form.label :number, "Numéro" %>
+        <%= form.text_field :number, placeholder: "F2026-004", required: true %>
+      </div>
+
+      <div class="field">
+        <%= form.label :client_id, "Client" %>
+        <%= form.collection_select :client_id, Client.order(:name), :id, :display_name, { prompt: "Sélectionner un client" }, { required: true } %>
+      </div>
+
+      <div class="field">
+        <%= form.label :issued_on, "Date d’émission" %>
+        <%= form.date_field :issued_on, required: true %>
+      </div>
+
+      <div class="field">
+        <%= form.label :due_on, "Date d’échéance" %>
+        <%= form.date_field :due_on, required: true %>
+      </div>
+
+      <div class="field">
+        <%= form.label :status, "Statut" %>
+        <%= form.select :status, options_for_select([["Brouillon", "draft"], ["Envoyée", "sent"], ["Payée", "paid"]], invoice.status) %>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-section">
+    <div class="form-section__intro form-section__intro--with-action">
+      <div>
+        <h2>Lignes de facture</h2>
+        <p>Ajoutez les prestations facturées à votre client.</p>
+      </div>
+      <button type="button" class="button button--small button--secondary" data-action="click->line-items#add">
+        <span aria-hidden="true">＋</span> Ajouter une ligne
+      </button>
+    </div>
+
+    <div class="line-items" data-line-items-target="list">
+      <%= form.fields_for :invoice_lines do |line_form| %>
+        <%= render "line_fields", line_form: line_form %>
+      <% end %>
+    </div>
+
+    <template data-line-items-target="template">
+      <%= form.fields_for :invoice_lines, InvoiceLine.new, child_index: "__INDEX__" do |line_form| %>
+        <%= render "line_fields", line_form: line_form %>
+      <% end %>
+    </template>
+  </div>
+
+  <div class="form-section">
+    <div class="form-section__intro">
+      <h2>Note interne</h2>
+      <p>Une information facultative pour vous ou votre équipe.</p>
+    </div>
+
+    <div class="field">
+      <%= form.label :notes, "Note" %>
+      <%= form.text_area :notes, rows: 4, placeholder: "Conditions de règlement, contexte de la prestation…" %>
+    </div>
+  </div>
+
+  <div class="form-actions">
+    <%= form.submit invoice.persisted? ? "Enregistrer la facture" : "Créer la facture", class: "button button--primary" %>
+    <%= link_to "Annuler", invoice.persisted? ? invoice_path(invoice) : invoices_path, class: "button button--secondary" %>
+  </div>
+<% end %>

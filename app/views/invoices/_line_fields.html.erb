@@ -1,0 +1,32 @@
+<div class="line-item" data-line-item data-line-items-persisted="<%= line_form.object.persisted?.to_s %>">
+  <div class="line-item__fields">
+    <div class="field field--grow">
+      <%= line_form.label :description, "Description" %>
+      <%= line_form.text_field :description, placeholder: "Conseil, développement, formation…" %>
+    </div>
+
+    <div class="field field--quantity">
+      <%= line_form.label :quantity, "Qté" %>
+      <%= line_form.number_field :quantity, min: "0.01", step: "0.01", placeholder: "1" %>
+    </div>
+
+    <div class="field field--price">
+      <%= line_form.label :unit_price, "Prix HT" %>
+      <%= line_form.number_field :unit_price, min: "0", step: "0.01", placeholder: "0,00" %>
+    </div>
+
+    <div class="field field--vat">
+      <%= line_form.label :vat_rate, "TVA" %>
+      <%= line_form.select :vat_rate, options_for_select([["20 %", 20], ["10 %", 10], ["5,5 %", 5.5], ["0 %", 0]], line_form.object.vat_rate) %>
+    </div>
+
+    <button type="button" class="icon-button icon-button--danger" aria-label="Supprimer la ligne" data-action="click->line-items#remove">
+      ×
+    </button>
+  </div>
+
+  <% if line_form.object.persisted? %>
+    <%= line_form.hidden_field :id %>
+    <%= line_form.check_box :_destroy, class: "line-item__destroy", data: { line_items_target: "destroy" } %>
+  <% end %>
+</div>

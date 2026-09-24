@@ -15,6 +15,7 @@ class Invoice < ApplicationRecord
   validates :issued_on, :due_on, presence: true
   validates :status, inclusion: { in: STATUSES }
   validate :due_on_after_issued_on
+  validate :must_have_invoice_lines
 
   scope :recent, -> { order(issued_on: :desc, id: :desc) }
   scope :overdue, -> { where(status: "sent").where("due_on < ?", Date.current) }
@@ -68,5 +69,11 @@ class Invoice < ApplicationRecord
     return if due_on >= issued_on
 
     errors.add(:due_on, "doit être postérieure à la date d'émission")
+  end
+
+  def must_have_invoice_lines
+    return if invoice_lines.reject(&:marked_for_destruction?).any?
+
+    errors.add(:base, "Ajoutez au moins une ligne de facture.")
   end
 end

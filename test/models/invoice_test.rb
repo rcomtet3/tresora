@@ -3,11 +3,19 @@ require "test_helper"
 class InvoiceTest < ActiveSupport::TestCase
   test "assigns default dates and draft status" do
     invoice = Invoice.new(client: clients(:acme), number: "F2026-099")
+    invoice.invoice_lines.build(description: "Prestation", quantity: 1, unit_price: 100, vat_rate: 20)
 
     assert invoice.save
     assert_equal "draft", invoice.status
     assert_equal Date.current, invoice.issued_on
     assert_equal issued_on_plus_thirty_days(invoice.issued_on), invoice.due_on
+  end
+
+  test "requires at least one invoice line" do
+    invoice = Invoice.new(client: clients(:acme), number: "F2026-098")
+
+    assert_not invoice.valid?
+    assert_includes invoice.errors[:base], "Ajoutez au moins une ligne de facture."
   end
 
   test "requires the due date to be after the issue date" do
@@ -31,13 +39,15 @@ class InvoiceTest < ActiveSupport::TestCase
   end
 
   test "is overdue when a sent invoice is past due" do
-    invoice = Invoice.create!(
+    invoice = Invoice.new(
       client: clients(:acme),
       number: "F2026-101",
       issued_on: 40.days.ago.to_date,
       due_on: 10.days.ago.to_date,
       status: "sent"
     )
+    invoice.invoice_lines.build(description: "Prestation", quantity: 1, unit_price: 100, vat_rate: 20)
+    invoice.save!
 
     assert invoice.overdue?
     assert_equal "overdue", invoice.display_status

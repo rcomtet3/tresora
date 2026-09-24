@@ -1,0 +1,105 @@
+<% content_for :title, "Tableau de bord · Tresora" %>
+
+<section class="dashboard-hero">
+  <div>
+    <p class="eyebrow">Vue d’ensemble</p>
+    <h1>Bonjour, voici votre trésorerie.</h1>
+    <p class="page-header__description">Un aperçu rapide de vos factures et de vos priorités.</p>
+  </div>
+  <%= link_to "Créer une facture", new_invoice_path, class: "button button--light" %>
+</section>
+
+<section class="metric-grid">
+  <div class="metric-card metric-card--primary">
+    <span class="metric-card__label">Total facturé</span>
+    <strong class="metric-card__value"><%= format_euros(@total_billed) %></strong>
+    <span class="metric-card__hint">Toutes factures confondues</span>
+  </div>
+  <div class="metric-card">
+    <span class="metric-card__label">Encaissé</span>
+    <strong class="metric-card__value"><%= format_euros(@collected) %></strong>
+    <span class="metric-card__hint">Factures marquées payées</span>
+  </div>
+  <div class="metric-card">
+    <span class="metric-card__label">À encaisser</span>
+    <strong class="metric-card__value"><%= format_euros(@outstanding) %></strong>
+    <span class="metric-card__hint">Factures envoyées</span>
+  </div>
+  <div class="metric-card <%= "metric-card--warning" if @overdue_count.positive? %>">
+    <span class="metric-card__label">Alertes</span>
+    <strong class="metric-card__value"><%= @overdue_count %></strong>
+    <span class="metric-card__hint"><%= @overdue_count.zero? ? "Aucune facture en retard" : "Factures à relancer" %></span>
+  </div>
+</section>
+
+<section class="dashboard-grid">
+  <div class="card card--table">
+    <div class="card__header">
+      <div>
+        <h2>Dernières factures</h2>
+        <p class="muted">Les cinq dernières factures de votre registre</p>
+      </div>
+      <%= link_to "Tout voir", invoices_path, class: "text-link" %>
+    </div>
+
+    <% if @invoices.any? %>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Facture</th>
+              <th>Client</th>
+              <th>Statut</th>
+              <th class="numeric">Montant TTC</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @invoices.each do |invoice| %>
+              <tr>
+                <td>
+                  <%= link_to invoice.number, invoice_path(invoice), class: "table-primary-link" %>
+                  <small class="table-secondary"><%= format_date(invoice.issued_on) %></small>
+                </td>
+                <td><%= invoice.client.display_name %></td>
+                <td><span class="badge <%= invoice_status_class(invoice) %>"><%= invoice_status_label(invoice) %></span></td>
+                <td class="numeric"><strong><%= format_euros(invoice.total_ttc) %></strong></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    <% else %>
+      <div class="empty-state">
+        <div class="empty-state__icon">€</div>
+        <h3>Votre registre est vide</h3>
+        <p>Commencez par créer une facture pour voir apparaître vos indicateurs.</p>
+        <%= link_to "Créer ma première facture", new_invoice_path, class: "button button--primary" %>
+      </div>
+    <% end %>
+  </div>
+
+  <aside class="dashboard-aside">
+    <div class="card quick-actions">
+      <span class="label">Actions rapides</span>
+      <h3>Faire avancer votre activité</h3>
+      <%= link_to new_invoice_path, class: "quick-action" do %>
+        <span class="quick-action__icon">＋</span>
+        <span><strong>Nouvelle facture</strong><small>Créer une émission</small></span>
+        <span class="quick-action__arrow">→</span>
+      <% end %>
+      <%= link_to new_client_path, class: "quick-action" do %>
+        <span class="quick-action__icon">◎</span>
+        <span><strong>Nouveau client</strong><small>Compléter le répertoire</small></span>
+        <span class="quick-action__arrow">→</span>
+      <% end %>
+    </div>
+
+    <div class="card insight-card">
+      <span class="label">Répartition</span>
+      <h3><%= pluralize(@clients_count, "client") %>, <%= pluralize(@all_invoices.size, "facture") %></h3>
+      <% collection_rate = @total_billed.positive? ? (@collected.to_f / @total_billed) * 100 : 0 %>
+      <div class="progress-track"><span style="width: <%= collection_rate.round %>%"></span></div>
+      <p><%= number_with_precision(collection_rate, precision: 0) %>% du montant facturé est encaissé.</p>
+    </div>
+  </aside>
+</section>

@@ -1,0 +1,37 @@
+<%= form_with model: client, class: "form" do |form| %>
+  <%= render "shared/form_errors", record: client %>
+
+  <div class="form-section">
+    <div class="form-section__intro">
+      <h2>Identité</h2>
+      <p>Les informations principales de votre interlocuteur.</p>
+    </div>
+
+    <div class="form-grid">
+      <div class="field field--full">
+        <%= form.label :name, "Nom du contact" %>
+        <%= form.text_field :name, placeholder: "Camille Bernard", autofocus: true, required: true %>
+      </div>
+
+      <div class="field">
+        <%= form.label :company, "Société" %>
+        <%= form.text_field :company, placeholder: "Acme Studio" %>
+      </div>
+
+      <div class="field">
+        <%= form.label :email, "E-mail" %>
+        <%= form.email_field :email, placeholder: "camille@acme.fr" %>
+      </div>
+
+      <div class="field field--full">
+        <%= form.label :address, "Adresse de facturation" %>
+        <%= form.text_area :address, rows: 3, placeholder: "12 rue des Lilas, 75011 Paris" %>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-actions">
+    <%= form.submit client.persisted? ? "Enregistrer les modifications" : "Ajouter le client", class: "button button--primary" %>
+    <%= link_to "Annuler", client.persisted? ? clients_path : new_client_path, class: "button button--secondary" %>
+  </div>
+<% end %>

@@ -1,0 +1,81 @@
+<% content_for :title, "Factures · Tresora" %>
+
+<section class="page-header">
+  <div>
+    <p class="eyebrow">Pilotage</p>
+    <h1>Factures</h1>
+    <p class="page-header__description">Suivez vos émissions, vos échéances et vos encaissements.</p>
+  </div>
+  <%= link_to "Nouvelle facture", new_invoice_path, class: "button button--primary" %>
+</section>
+
+<section class="metric-grid metric-grid--compact">
+  <div class="metric-card">
+    <span class="metric-card__label">En attente</span>
+    <strong class="metric-card__value"><%= format_euros(@outstanding_total) %></strong>
+    <span class="metric-card__hint">Factures envoyées non payées</span>
+  </div>
+  <div class="metric-card">
+    <span class="metric-card__label">En retard</span>
+    <strong class="metric-card__value"><%= @overdue_count %></strong>
+    <span class="metric-card__hint">À relancer rapidement</span>
+  </div>
+  <div class="metric-card">
+    <span class="metric-card__label">Brouillons</span>
+    <strong class="metric-card__value"><%= @draft_count %></strong>
+    <span class="metric-card__hint">À finaliser</span>
+  </div>
+</section>
+
+<section class="card card--table">
+  <div class="card__header">
+    <div>
+      <h2><%= pluralize(@invoices.size, "facture") %></h2>
+      <p class="muted">Les dernières factures créées</p>
+    </div>
+    <%= link_to "Voir tous les clients", clients_path, class: "text-link" %>
+  </div>
+
+  <% if @invoices.any? %>
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Facture</th>
+            <th>Client</th>
+            <th>Échéance</th>
+            <th>Statut</th>
+            <th class="numeric">Montant TTC</th>
+            <th class="table-actions">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @invoices.each do |invoice| %>
+            <tr>
+              <td>
+                <%= link_to invoice.number, invoice_path(invoice), class: "table-primary-link" %>
+                <small class="table-secondary"><%= format_date(invoice.issued_on) %></small>
+              </td>
+              <td>
+                <%= link_to invoice.client.display_name, edit_client_path(invoice.client), class: "table-secondary-link" %>
+              </td>
+              <td><%= format_date(invoice.due_on) %></td>
+              <td><span class="badge <%= invoice_status_class(invoice) %>"><%= invoice_status_label(invoice) %></span></td>
+              <td class="numeric"><strong><%= format_euros(invoice.total_ttc) %></strong></td>
+              <td class="table-actions">
+                <%= link_to "Ouvrir", invoice_path(invoice), class: "button button--small button--secondary" %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% else %>
+    <div class="empty-state">
+      <div class="empty-state__icon">€</div>
+      <h3>Votre première facture est à portée de clic</h3>
+      <p>Créez une facture pour visualiser automatiquement son montant et son statut.</p>
+      <%= link_to "Créer une facture", new_invoice_path, class: "button button--primary" %>
+    </div>
+  <% end %>
+</section>

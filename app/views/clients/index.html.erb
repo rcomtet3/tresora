@@ -1,0 +1,70 @@
+<% content_for :title, "Clients · Tresora" %>
+
+<section class="page-header">
+  <div>
+    <p class="eyebrow">Répertoire</p>
+    <h1>Clients</h1>
+    <p class="page-header__description">Centralisez vos interlocuteurs et leurs informations de facturation.</p>
+  </div>
+  <%= link_to "Nouveau client", new_client_path, class: "button button--primary" %>
+</section>
+
+<section class="card card--table">
+  <div class="card__header">
+    <div>
+      <h2><%= pluralize(@clients.size, "client") %></h2>
+      <p class="muted">Vos clients enregistrés</p>
+    </div>
+  </div>
+
+  <% if @clients.any? %>
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Client</th>
+            <th>Contact</th>
+            <th>Factures</th>
+            <th class="table-actions">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @clients.each do |client| %>
+            <tr>
+              <td>
+                <div class="person">
+                  <span class="avatar"><%= initials_for(client.display_name) %></span>
+                  <span>
+                    <strong><%= client.display_name %></strong>
+                    <% if client.company.blank? %>
+                      <small>Particulier</small>
+                    <% end %>
+                  </span>
+                </div>
+              </td>
+              <td>
+                <% if client.email.present? %>
+                  <a href="mailto:<%= client.email %>"><%= client.email %></a>
+                <% else %>
+                  <span class="muted">—</span>
+                <% end %>
+              </td>
+              <td><%= pluralize(client.invoices.size, "facture") %></td>
+              <td class="table-actions">
+                <%= link_to "Modifier", edit_client_path(client), class: "button button--small button--secondary" %>
+                <%= button_to "Supprimer", client_path(client), method: :delete, class: "button button--small button--ghost-danger", form: { data: { turbo_confirm: "Supprimer ce client et ses factures ?" } } %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% else %>
+    <div class="empty-state">
+      <div class="empty-state__icon">◎</div>
+      <h3>Aucun client pour le moment</h3>
+      <p>Ajoutez votre premier client pour commencer à établir vos factures.</p>
+      <%= link_to "Ajouter un client", new_client_path, class: "button button--primary" %>
+    </div>
+  <% end %>
+</section>
