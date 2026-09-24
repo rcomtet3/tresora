@@ -1,0 +1,11 @@
+acme:
+  name: Camille Bernard
+  email: camille@example.com
+  company: Acme Studio
+  address: 12 rue des Lilas, Paris
+
+studio_lumen:
+  name: Marc Leroy
+  email: marc@example.com
+  company: Studio Lumen
+  address: 8 avenue Victor Hugo, Lyon

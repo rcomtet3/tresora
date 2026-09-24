@@ -1,0 +1,23 @@
+acme_current:
+  client: acme
+  number: F2026-001
+  issued_on: <%= 10.days.ago.to_date.to_s %>
+  due_on: <%= 20.days.from_now.to_date.to_s %>
+  status: sent
+  notes: Merci pour votre confiance.
+
+acme_paid:
+  client: acme
+  number: F2026-002
+  issued_on: <%= 40.days.ago.to_date.to_s %>
+  due_on: <%= 10.days.ago.to_date.to_s %>
+  status: paid
+  notes: ""
+
+lumen_draft:
+  client: studio_lumen
+  number: F2026-003
+  issued_on: <%= 2.days.ago.to_date.to_s %>
+  due_on: <%= 28.days.from_now.to_date.to_s %>
+  status: draft
+  notes: Proposition en cours.

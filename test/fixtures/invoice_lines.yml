@@ -1,0 +1,27 @@
+acme_consulting:
+  invoice: acme_current
+  description: Audit et conseil
+  quantity: 2
+  unit_price: 500
+  vat_rate: 20
+
+acme_support:
+  invoice: acme_current
+  description: Support mensuel
+  quantity: 1
+  unit_price: 150
+  vat_rate: 20
+
+acme_paid_design:
+  invoice: acme_paid
+  description: Interface web
+  quantity: 1
+  unit_price: 1200
+  vat_rate: 20
+
+lumen_discovery:
+  invoice: lumen_draft
+  description: Atelier de découverte
+  quantity: 1
+  unit_price: 450
+  vat_rate: 20
