@@ -1,7 +1,7 @@
 source "https://rubygems.org"
 
 # Keep the JSON parser compatible with the Active Support version used here.
-gem "json", "~> 2.10.2"
+gem "json", "~> 3.0.2"
 
 # Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
 gem "rails", "~> 8.1.3", ">= 8.1.3.1"
